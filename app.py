@@ -1,6 +1,10 @@
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, \
     abort, render_template, flash, jsonify
+from flask.ext.sqlalchemy import SQLAlchemy
+import os 
+
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 #configuration
 DATABASE = 'flaskr.db'
@@ -9,32 +13,16 @@ SECRET_KEY = 'my_precious'
 USERNAME = 'admin'
 PASSWORD = 'admin'
 
+DATABASE_PATH = os.path.join(basedir, DATABASE)
+
+SQLALCHEMY_DATABASE_URL = 'sqlite:///' + DATABASE_PATH
+
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+db = SQLAlchemy(app)
 
-def connect_db():
-    """Connects to the database."""
-    rv = sqlite3.connect(app.config['DATABASE'])
-    rv.row_factory = sqlite3.Row
-    return rv
-
-def init_db():
-    with app.app_context():
-        db = get_db()
-        with app.open_resource('schema.sql', mode='r') as f:
-            db.cursor().executescript(f.read())
-        db.commit()
-
-def get_db():
-    if not hasattr(g, 'sqlite_db'):
-        g.sqlite_db = connect_db()
-    return g.sqlite_db
-
-@app.teardown_appcontext
-def close_db(error):
-    if hasattr(g, 'sqlite_db'):
-        g.sqlite_db.close()
+import models 
 
 @app.route('/')
 def index():

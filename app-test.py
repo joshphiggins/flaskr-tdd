@@ -1,8 +1,9 @@
 import unittest
-import tempfile
 import os
-import app
-import json 
+from flask import json 
+import app 
+
+TEST_DB = 'test.db'
 
 
 class BasicTestCase(unittest.TestCase):
