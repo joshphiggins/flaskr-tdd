@@ -5,3 +5,4 @@ db.create_all()
 
 db.session.commit()
 
+print(db)

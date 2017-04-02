@@ -15,21 +15,22 @@ PASSWORD = 'admin'
 
 DATABASE_PATH = os.path.join(basedir, DATABASE)
 
-SQLALCHEMY_DATABASE_URL = 'sqlite:///' + DATABASE_PATH
-
+print(DATABASE_PATH)
+SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE_PATH
+print(SQLALCHEMY_DATABASE_URI)
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
 
 import models 
 
 @app.route('/')
 def index():
     """Searches the database for entries, then displays them."""
-    db = get_db()
-    cur = db.execute('select * from entries order by id desc')
-    entries = cur.fetchall()
+    entries = db.session.query(models.Flaskr)
     return render_template('index.html', entries=entries)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -59,12 +60,9 @@ def add_entry():
     """Add new post to database."""
     if not session.get('logged_in'):
         abort(401)
-    db = get_db()
-    db.execute(
-        'insert into entries (title, text) values(?, ?)',
-        [request.form['title'], request.form['text']]
-    )
-    db.commit()
+    new_entry = models.Flaskr(request.form['title'], request.form['text'])
+    db.session.add(new_entry)
+    db.session.commit()
     flash('New entry was sucessfully posted')
     return redirect(url_for('index'))
 
@@ -73,16 +71,15 @@ def delete_entry(post_id):
     """Delete post from database"""
     result = {'status':0, 'message': 'Error'}
     try:
-        db = get_db()
-        db.execute('delete from entries where id=' + post_id)
-        db.commit()
+        new_id = post_id
+        db.session.query(models.Flaskr).filter_by(post_id=new_id).delete()
+        db.session.commit()
         result= {'status': 1, 'message':"Post Deleted"}
+        flash('The entry was deleted.')
     except Exception as e:
         result = {'status':0, 'message': repr(e)}
-
     return jsonify(result)
 
 if __name__ == "__main__":
-    init_db()
     app.run()
 

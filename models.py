@@ -2,7 +2,7 @@ from app import db
 
 class Flaskr(db.Model):
 
-    __tablesome__ = "flaskr"
+    __tablename__ = "flaskr"
 
     post_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
