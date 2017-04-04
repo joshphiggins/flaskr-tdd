@@ -10,7 +10,7 @@ class Flaskr(db.Model):
 
     def __init__(self, title, text):
         self.title = title
-        self.text = text 
+        self.text = text
 
     def __repr__(self):
         return '<title {}>'.format(self.body)
