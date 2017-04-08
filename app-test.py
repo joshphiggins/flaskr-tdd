@@ -1,7 +1,7 @@
 import unittest
 import os
-from flask import json 
-from app import app, db 
+from flask import json
+from app import app, db
 
 TEST_DB = 'test.db'
 

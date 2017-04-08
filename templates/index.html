@@ -12,7 +12,20 @@
     <h1>Flaskr-TDD</h1>
 
     {% if not session.logged_in %}
-      <a href="{{ url_for('login') }}">log in</a>
+      <h2>Login</h2>
+      {% if error %}
+      <p class="error"><strong>Error:</strong>{{ error }}</p>
+      {% endif %}
+      <form class="form" action="/login" method="POST"  id="login">
+        <dl>
+          <dt>Username:</dt>
+          <dd><input type="text" name="username" id="username"></dd>
+          <dt>Password:</dt>
+          <dd><input type="password" name="password" id="password"></dd>
+          <dd><input type="submit" value="Login"></dd>
+          <span> Use "admin" for username and password</span>
+        </dl>
+      </form>
     {% else %}
       <a href="{{ url_for('logout') }}">log out</a>
     {% endif %}

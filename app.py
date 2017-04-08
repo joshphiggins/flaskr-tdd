@@ -1,8 +1,8 @@
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, \
-    abort, render_template, flash, jsonify
+    abort, render_template, flash, jsonify, abort
 from flask.ext.sqlalchemy import SQLAlchemy
-import os 
+import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -15,9 +15,7 @@ PASSWORD = 'admin'
 
 DATABASE_PATH = os.path.join(basedir, DATABASE)
 
-print(DATABASE_PATH)
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE_PATH
-print(SQLALCHEMY_DATABASE_URI)
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -25,7 +23,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
-import models 
+import models
 
 @app.route('/')
 def index():
@@ -33,20 +31,24 @@ def index():
     entries = db.session.query(models.Flaskr)
     return render_template('index.html', entries=entries)
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['POST'])
 def login():
     """User login/authication/session management."""
     error = None
-    if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME']:
-            error = 'Invalid username'
-        elif request.form['password'] != app.config['PASSWORD']:
-            error = 'Invalid password'
-        else:
-            session['logged_in'] = True
-            flash('You were logged in')
-            return redirect(url_for('index'))
-    return render_template('login.html', error=error)
+
+    data = request.get_json()
+    print(data)
+    username = data['username']
+    password = data['password']
+
+    if username == app.config['USERNAME'] and password == app.config['PASSWORD']:
+        session['logged_in'] = True
+        status = True
+        flash('You were logged in')
+        print('logged in')
+    else:
+        status = False
+    return jsonify({'result': status})#return error
 
 @app.route('/logout')
 def logout():
