@@ -89,16 +89,19 @@ $(document).ready(function(){
 // helper
 
 function get_all_entries(){
-    $.getJSON('/entries', 
-        var entries = $('#entries')
-        function(json){
-        json.items.each(function(index, item){
-            entries.append($(document.create('li class=').id(json.post_id).text))
-        })
-    
-    $('#entries').html(html)
+    var entries = $('#entries');
+    $.getJSON('/get_entries',function(json){
+        console.log(json);
+        //json.items.each(function(index, item){
+            //var li = document.create('li');
+            //li.setAttribute('class', 'entry');
+            //var header = $("<h2 id="+item.post_id+">"+item.title+"</h2");
+            //li.append(header);
+            //li.innerHTML = item.text;
+            //entries.append(li);
     })
-}
+};
+
 
 
 

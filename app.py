@@ -3,6 +3,7 @@ from flask import Flask, request, session, g, redirect, url_for, \
     abort, render_template, flash, jsonify, abort
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
+from flask_marshmallow import Marshmallow
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -25,15 +26,24 @@ csrf.init_app(app)
 app.config.from_object(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-
+ma = Marshmallow(app)
 
 import models
+
+
+
 
 @app.route('/')
 def index():
     """Searches the database for entries, then displays them."""
     entries = db.session.query(models.Flaskr)
     return render_template('index.html', entries=entries)
+
+@app.route('/get_entries')
+def get_entries():
+    flaskr_schema = FlaskrSchema()
+    entries = db.session.query(models.Flaskr)
+    return jsonify(flaskr_schema.dump(entries).data)
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -92,6 +102,10 @@ def delete_entry(post_id):
     except Exception as e:
         result = {'status':0, 'message': repr(e)}
     return jsonify(result)
+
+class FlaskrSchema(ma.ModelSchema):
+    class Meta:
+        model = models.Flaskr
 
 if __name__ == "__main__":
     app.run()
