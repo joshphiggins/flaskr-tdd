@@ -2,6 +2,7 @@ import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, \
     abort, render_template, flash, jsonify, abort
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -17,7 +18,10 @@ DATABASE_PATH = os.path.join(basedir, DATABASE)
 
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE_PATH
 
+csrf = CSRFProtect()
+
 app = Flask(__name__)
+csrf.init_app(app)
 app.config.from_object(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -44,11 +48,11 @@ def login():
     if username == app.config['USERNAME'] and password == app.config['PASSWORD']:
         session['logged_in'] = True
         status = True
-        flash('You were logged in')
-        print('logged in')
+        message = 'You were logged in'
     else:
         status = False
-    return jsonify({'result': status})#return error
+        message = 'Incorrect login'
+    return jsonify({'result': status, 'message': message})#return error
 
 @app.route('/logout')
 def logout():
@@ -60,13 +64,20 @@ def logout():
 @app.route('/add', methods=['POST'])
 def add_entry():
     """Add new post to database."""
-    if not session.get('logged_in'):
-        abort(401)
-    new_entry = models.Flaskr(request.form['title'], request.form['text'])
-    db.session.add(new_entry)
-    db.session.commit()
-    flash('New entry was sucessfully posted')
-    return redirect(url_for('index'))
+    try:
+        if not session.get('logged_in'):
+            abort(401)
+        data = request.get_json()
+        print(data)
+        new_entry = models.Flaskr(data['title'], data['text'])
+        db.session.add(new_entry)
+        db.session.commit()
+        status = True
+        message = 'New entry was sucessfully posted'
+    except Exception as e:
+        status = False
+        message = repr(e)
+    return jsonify({'result': status, 'message': message})
 
 @app.route('/delete/<post_id>', methods=['GET'])
 def delete_entry(post_id):
