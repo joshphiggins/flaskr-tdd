@@ -13,7 +13,4 @@ class Flaskr(db.Model):
         self.text = text
 
     def __repr__(self):
-        return '<title {}>'.format(self.body)
-
-    def as_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return '<title {}>'.format(self.title)

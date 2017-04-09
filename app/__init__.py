@@ -1,12 +1,12 @@
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, \
     abort, render_template, flash, jsonify, abort
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
-from flask_marshmallow import Marshmallow
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
+
 
 #configuration
 DATABASE = 'flaskr.db'
@@ -26,12 +26,8 @@ csrf.init_app(app)
 app.config.from_object(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-ma = Marshmallow(app)
 
-import models
-
-
-
+from app import models
 
 @app.route('/')
 def index():
@@ -41,9 +37,10 @@ def index():
 
 @app.route('/get_entries')
 def get_entries():
-    flaskr_schema = FlaskrSchema()
-    entries = db.session.query(models.Flaskr)
-    return jsonify(flaskr_schema.dump(entries).data)
+    entries = db.session.query(models.Flaskr).all()
+    entries_dict = [{'post_id':e.post_id, 'title': e.title, 'text': e.title} \
+                    for e in entries]
+    return jsonify(entries_dict)
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -103,9 +100,7 @@ def delete_entry(post_id):
         result = {'status':0, 'message': repr(e)}
     return jsonify(result)
 
-class FlaskrSchema(ma.ModelSchema):
-    class Meta:
-        model = models.Flaskr
+
 
 if __name__ == "__main__":
     app.run()

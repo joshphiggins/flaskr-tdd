@@ -1,4 +1,4 @@
-from app import db 
+from app import db
 from models import Flaskr
 
 db.create_all()
