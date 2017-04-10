@@ -7,6 +7,9 @@ $.ajaxSetup({
         }
     }
 })
+window.onload = function() {
+  get_all_entries();
+};
 
 $(document).ready(function(){
     console.log("ready!");
@@ -100,9 +103,6 @@ $(document).ready(function(){
         });
     });
 
-
-
-    
 
 });
 

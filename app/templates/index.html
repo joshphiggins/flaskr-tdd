@@ -33,6 +33,7 @@
 
     <div id="flash" class="well hidden"></div>
 
+
       <form action="{{ url_for('add_entry') }}" method="post" class="add-entry" id="add-entry">
         <dl>
           <dt>Title:</dt>
@@ -42,9 +43,10 @@
           <dd><input type ="submit" value="Share"></dd>
         </dl>
       </form>
-
+    </div>
     <br>
 
+    <div id ='entries-view' class=''>
     <ul class="entries">
     </ul>
   </div>
