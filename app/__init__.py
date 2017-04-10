@@ -48,7 +48,6 @@ def login():
     error = None
 
     data = request.get_json()
-    print(data)
     username = data['username']
     password = data['password']
 
@@ -61,11 +60,12 @@ def login():
         message = 'Incorrect login'
     return jsonify({'result': status, 'message': message})#return error
 
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 def logout():
     """User logout/authentication/session management."""
     session.pop('logged_in', None)
-    return redirect(url_for('index'))
+    print('logout test')
+    return jsonify({'response': 'You were logged out'})
 
 @app.route('/add', methods=['POST'])
 def add_entry():

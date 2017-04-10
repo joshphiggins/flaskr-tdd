@@ -14,9 +14,7 @@
     <!-- Logged out view -->
     <div id='logged-out-view' class='well'>
       <h2>Login</h2>
-      {% if error %}
-      <p class="error"><strong>Error:</strong>{{ error }}</p>
-      {% endif %}
+      <div id="flash" class="well hidden"></div>
       <form class="form" action="/login" method="POST"  id="login">
         <dl>
           <dt>Username:</dt>
@@ -31,11 +29,10 @@
 
     <!-- Logged in View -->
     <div id='logged-in-view' class='well hidden'>
-      <button type="button" class="btn btn-success" href="{{ url_for('logout') }}">log out</button>
+      <button type="button" class="btn btn-success" href="{{ url_for('logout') }}">Log Out</button>
 
     <div id="flash" class="well hidden"></div>
 
-    {% if session.logged_in %}
       <form action="{{ url_for('add_entry') }}" method="post" class="add-entry" id="add-entry">
         <dl>
           <dt>Title:</dt>
@@ -45,16 +42,10 @@
           <dd><input type ="submit" value="Share"></dd>
         </dl>
       </form>
-    {% endif %}
 
     <br>
 
     <ul class="entries">
-      {% for entry in entries %}
-        <li class="entry"><h2 id={{ entry.post_id }}>{{ entry.title }}</h2>{{ entry.text|safe }}</li>
-      {% else %}
-        <li><em>No entries here so far</em></li>
-      {% endfor %}
     </ul>
   </div>
 
