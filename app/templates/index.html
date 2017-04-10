@@ -33,9 +33,7 @@
     <div id='logged-in-view' class='well hidden'>
       <button type="button" class="btn btn-success" href="{{ url_for('logout') }}">log out</button>
 
-    {% for message in get_flashed_messages() %}
-      <div class="flash">{{ message }}</div>
-    {% endfor %}
+    <div id="flash" class="well hidden"></div>
 
     {% if session.logged_in %}
       <form action="{{ url_for('add_entry') }}" method="post" class="add-entry" id="add-entry">

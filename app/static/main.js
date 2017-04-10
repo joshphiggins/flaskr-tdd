@@ -39,6 +39,9 @@ $(document).ready(function(){
     $('#logged-in-view button').click(function(){
         var url = '/logout'
         $.post(url);
+        window.location.href = "/";
+        $('#flash').text('You were logged out')
+
     });
 
     $('#add-entry').on('submit', function(e){
@@ -56,6 +59,7 @@ $(document).ready(function(){
                     $('#title').val("");
                     $('#text').val("");
                     //update entries
+                    get_all_entries()
                 }else{
                     alert(json.message);
             }},
@@ -89,18 +93,22 @@ $(document).ready(function(){
 // helper
 
 function get_all_entries(){
-    var entries = $('#entries');
+    
     $.getJSON('/get_entries',function(json){
-        console.log(json);
-        //json.items.each(function(index, item){
-            //var li = document.create('li');
-            //li.setAttribute('class', 'entry');
-            //var header = $("<h2 id="+item.post_id+">"+item.title+"</h2");
-            //li.append(header);
-            //li.innerHTML = item.text;
-            //entries.append(li);
-    })
-};
+        console.log(json.entries);
+        var entries = $('ul.entries');
+        entries.empty();
+        json.entries.forEach(function(value, index){
+            var li = $('<li></li>')
+                .addClass('entry')
+                .text(value.text)
+                .appendTo(entries);
+            var header = $("<h2 id="+value.post_id+"></h2")
+                .text(value.title)
+                .prependTo(li);
+        });
+    });
+}
 
 
 

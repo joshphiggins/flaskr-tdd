@@ -38,9 +38,9 @@ def index():
 @app.route('/get_entries')
 def get_entries():
     entries = db.session.query(models.Flaskr).all()
-    entries_dict = [{'post_id':e.post_id, 'title': e.title, 'text': e.title} \
+    entries_dict = [{'post_id':e.post_id, 'title': e.title, 'text': e.text} \
                     for e in entries]
-    return jsonify(entries_dict)
+    return jsonify({'entries' :entries_dict})
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -65,7 +65,6 @@ def login():
 def logout():
     """User logout/authentication/session management."""
     session.pop('logged_in', None)
-    flash('You were logged out')
     return redirect(url_for('index'))
 
 @app.route('/add', methods=['POST'])
