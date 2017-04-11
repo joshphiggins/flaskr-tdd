@@ -11,7 +11,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 #configuration
 DATABASE = 'flaskr.db'
 DEBUG = True
-SECRET_KEY = 'my_precious'
+SECRET_KEY = '\xe1\xa1\x15u\x007\xe2u\r~\xd4g*\xe92\xf6\x13I\xa8\xcb\x00\x9b\x0f'
 USERNAME = 'admin'
 PASSWORD = 'admin'
 
@@ -64,7 +64,6 @@ def login():
 def logout():
     """User logout/authentication/session management."""
     session.pop('logged_in', None)
-    print('logout test')
     return jsonify({'response': 'You were logged out'})
 
 @app.route('/add', methods=['POST'])
@@ -74,7 +73,6 @@ def add_entry():
         if not session.get('logged_in'):
             abort(401)
         data = request.get_json()
-        print(data)
         new_entry = models.Flaskr(data['title'], data['text'])
         db.session.add(new_entry)
         db.session.commit()

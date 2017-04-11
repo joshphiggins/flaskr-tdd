@@ -1,98 +1,98 @@
 import unittest
 import os
-from flask import json
+import json
+
+from flask_testing import TestCase
+
 from app import app, db
 
 TEST_DB = 'test.db'
 
 
-class BasicTestCase(unittest.TestCase):
-
-    def test_index(self):
-        """initial test. ensure flask was set up correctly"""
-        tester = app.test_client(self)
-        response = tester.get('/', content_type='html/text')
-        self.assertEqual(response.status_code, 200)
-
-    def test_database(self):
-        """initial test. ensure that the database exists"""
-        tester = os.path.exists("app/flaskr.db")
-        self.assertTrue(tester)
-
-class FlaskrTestCase(unittest.TestCase):
-
-    def setUp(self):
-        """Set up  a blank temp database before each test"""
+class BaseTestCase(TestCase):
+    def create_app(self):
         basedir = os.path.abspath(os.path.dirname(__file__))
         app.config['TESTING'] = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
             os.path.join(basedir, TEST_DB)
-        with app.test_request_context():
-            self.app = app.test_client()
-            db.create_all()
+        app.config['WTF_CSRF_ENABLED'] = False
+        return app
+
+    def setUp(self):
+        db.create_all()
+        db.session.commit()
 
     def tearDown(self):
-        """Destroy blank tem database after each test"""
-        with app.test_request_context():
-            db.drop_all()
+        db.session.remove()
+        db.drop_all()
 
-    def login(self, username, password):
-        """Login helper function"""
-        return self.app.post('/login', data=dict(
+class TestConfig(BaseTestCase):
+
+    def test_config(self):
+        self.assertTrue(app.config['DEBUG'] is True)
+        self.assertFalse(app.config['SECRET_KEY'] is 'my_precious')
+        self.assertTrue(
+            app.config['SQLALCHEMY_DATABASE_URI'] == 'sqlite:////Users/joshhiggins/Projects/flaskr-tdd/test.db'
+            )
+
+
+def login_user(self, username, password):
+    return self.client.post(
+        '/login',
+        data=json.dumps(dict(
             username=username,
-            password=password
-            ))
+            password=password)),
+        content_type='application/json')
 
-    def logout(self):
-        """Logout helper function"""
-        return self.app.get('/logout', follow_redirects=True)
 
-    # assert functoins
 
-#    def test_empty_db(self):
-#        """Ensure database is blank """
-#        rv = self.app.get('/')
-#        self.assertIn(b'No entries here so far', rv.data)
+class TestAuth(BaseTestCase):
 
-    def test_login_logout(self):
-        """Test login and logut using helper functions"""
-        rv = self.login(
-            app.config['USERNAME'],
-            app.config['PASSWORD']
-        )
-        self.assertIn(b'You were logged in', rv.data)
-        rv = self.logout()
-        self.assertIn(b'You were logged out', rv.data)
-        rv = self.login(
-            app.config['USERNAME'] + 'x',
-            app.config['PASSWORD']
-        )
-        self.assertIn(b'Invalid username', rv.data)
-        rv = self.login(
-            app.config['USERNAME'],
-            app.config['PASSWORD'] + 'x'
-        )
-        self.assertIn(b'Invalid password', rv.data)
+    def test_valid_login_logout(self):
 
-#    def test_messages(self):
-#        """Ensure that user can post messages"""
-#        self.login(
-#            app.config['USERNAME'],
-#            app.config['PASSWORD']
-#        )
-#        rv = self.app.post('/add', data=dict(
-#            title='<Hello>',
-#            text='<strong>HTML</strong> allowed here'
-#        ), follow_redirects=True)
-#        self.assertNotIn(b'No entries here so far', rv.data)
-#        self.assertIn(b'&lt;Hello&gt;', rv.data)
-#        self.assertIn(b'<strong>HTML</strong> allowed here', rv.data)
-#
-#    def test_delete_message(self):
-#        """Ensure the messages are being deleted"""
-#        rv = self.app.get('/delete/1')
-#        data = json.loads((rv.data).decode('utf-8'))
-#        self.assertEqual(data['status'], 1)
+        with self.client:
+            #test valid login
+            response = login_user(self, 'admin', 'admin')
+            self.assertEqual(response.status_code,200)
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['result'] is True)
+            self.assertTrue(data['message'] == 'You were logged in')
+
+            #test valid logout
+            logout_resp = self.client.post('/logout')
+            data = json.loads(logout_resp.data.decode())
+            self.assertEqual(response.status_code,200)
+            self.assertTrue(data['response'] == 'You were logged out')
+
+
+    def test_invalid_login(self):
+        #test invalid login
+        with self.client:
+            response = login_user(self, 'adminx', 'admin')
+            self.assertEqual(response.status_code,200)
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['result'] is False)
+            self.assertTrue(data['message'] == 'Incorrect login')
+
+    def test_message(self):
+        login_user(self, 'admin', 'admin')
+
+        response = self.client.post('/add',
+            data=json.dumps(dict(
+                title='test_title',
+                text='test_text')),
+            content_type='application/json')
+        self.assertEqual(response.status_code,200)
+        data = json.loads(response.data.decode())
+        self.assertTrue(data['result'] is True)
+        self.assertTrue(data['message'] == 'New entry was sucessfully posted')
+
+
+    def test_delete_message(self):
+        response = self.client.get('/delete/1')
+        self.assertEqual(response.status_code,200)
+        data = json.loads(response.data.decode('utf-8'))
+        self.assertEqual(data['status'], 1)
 
 if __name__ == '__main__':
     unittest.main()

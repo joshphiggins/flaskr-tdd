@@ -14,7 +14,8 @@ window.onload = function() {
 $(document).ready(function(){
     console.log("ready!");
 
-    $('li.entry').on('click', function(){
+
+    $('ul').on('click', 'li', function(){
         console.log('click working')
         var entry = this;
         var post_id = $(this).find('h2').attr('id');
@@ -51,7 +52,7 @@ $(document).ready(function(){
                 console.log(json.message);
                 show_msg(json.message);
                 }else{
-                show_msg('error with login');
+                show_msg(json.message);
             }},
             error : function(jqXHR){
                 console.log('error w/ json');
@@ -100,7 +101,7 @@ $(document).ready(function(){
             error: function(jqXHR){
                 console.log('error w/ json')
                 jsonValue = jQuery.parseJSON( jqXHR.responseText );
-                console.log(jsonValue.Message);
+                show_msg(jsonValue.Message);
             },
         });
     });
