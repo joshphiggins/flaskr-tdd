@@ -41,12 +41,14 @@ $(document).ready(function(){
             dataType: 'json',
             data : JSON.stringify({'username' : $('#username').val(), 'password' : $('#password').val()}),
             success: function(json){
+                console.log(json);
                 if(json.result == true){
                 $('#logged-out-view').addClass('hidden');
                 $('#logged-in-view').removeClass('hidden');
                 $('#username').val("");
                 $('#password').val("");
                 get_all_entries();
+                console.log(json.message);
                 show_msg(json.message);
                 }else{
                 show_msg('error with login');
@@ -130,7 +132,6 @@ function get_all_entries(){
 }
 
 function show_msg(msg){
-    $('#flash').removeClass('hidden');
-    $('#flash').text(msg);
+    $('.flash').text(msg);
 
 }

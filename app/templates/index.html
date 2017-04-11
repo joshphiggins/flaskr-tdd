@@ -14,7 +14,7 @@
     <!-- Logged out view -->
     <div id='logged-out-view' class='well'>
       <h2>Login</h2>
-      <div id="flash" class="well hidden"></div>
+      <div class="flash" ></div>
       <form class="form" action="/login" method="POST"  id="login">
         <dl>
           <dt>Username:</dt>
@@ -31,7 +31,7 @@
     <div id='logged-in-view' class='well hidden'>
       <button type="button" class="btn btn-success" href="{{ url_for('logout') }}">Log Out</button>
 
-    <div id="flash" class="well hidden"></div>
+    <div class="flash"></div>
 
 
       <form action="{{ url_for('add_entry') }}" method="post" class="add-entry" id="add-entry">

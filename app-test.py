@@ -41,7 +41,7 @@ class FlaskrTestCase(unittest.TestCase):
         return self.app.post('/login', data=dict(
             username=username,
             password=password
-            ), follow_redirects=True)
+            ))
 
     def logout(self):
         """Logout helper function"""
@@ -49,31 +49,31 @@ class FlaskrTestCase(unittest.TestCase):
 
     # assert functoins
 
-    def test_empty_db(self):
-        """Ensure database is blank """
-        rv = self.app.get('/')
-        self.assertIn(b'No entries here so far', rv.data)
-#
-#    def test_login_logout(self):
-#        """Test login and logut using helper functions"""
-#        rv = self.login(
-#            app.config['USERNAME'],
-#            app.config['PASSWORD']
-#        )
-#        self.assertIn(b'You were logged in', rv.data)
-#        rv = self.logout()
-#        self.assertIn(b'You were logged out', rv.data)
-#        rv = self.login(
-#            app.config['USERNAME'] + 'x',
-#            app.config['PASSWORD']
-#        )
-#        self.assertIn(b'Invalid username', rv.data)
-#        rv = self.login(
-#            app.config['USERNAME'],
-#            app.config['PASSWORD'] + 'x'
-#        )
-#        self.assertIn(b'Invalid password', rv.data)
-#
+#    def test_empty_db(self):
+#        """Ensure database is blank """
+#        rv = self.app.get('/')
+#        self.assertIn(b'No entries here so far', rv.data)
+
+    def test_login_logout(self):
+        """Test login and logut using helper functions"""
+        rv = self.login(
+            app.config['USERNAME'],
+            app.config['PASSWORD']
+        )
+        self.assertIn(b'You were logged in', rv.data)
+        rv = self.logout()
+        self.assertIn(b'You were logged out', rv.data)
+        rv = self.login(
+            app.config['USERNAME'] + 'x',
+            app.config['PASSWORD']
+        )
+        self.assertIn(b'Invalid username', rv.data)
+        rv = self.login(
+            app.config['USERNAME'],
+            app.config['PASSWORD'] + 'x'
+        )
+        self.assertIn(b'Invalid password', rv.data)
+
 #    def test_messages(self):
 #        """Ensure that user can post messages"""
 #        self.login(
